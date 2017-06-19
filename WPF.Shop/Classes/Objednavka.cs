@@ -13,7 +13,7 @@ namespace WPF.Shop.Classes
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; } //slouzi jako CISLO OBJEDNAVKY
         public int IDuzivatele { get; set; }
-        public List<int> IDzbozi { get; set; }
-        public List<int> mnozstviZbozi { get; set; }
+        public int IDzbozi { get; set; }
+        public int mnozstviZbozi { get; set; }
     }
 }

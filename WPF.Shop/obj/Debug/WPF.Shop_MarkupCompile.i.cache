@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\honza\Source\Repos\WPF.Shop2\WPF.Shop\App.xaml
-3-150645835
+4-1107913055
 2-121034974
-22-2985274
+231084376916
 73-997670781
-Cart.xaml;MainWindow.xaml;StartPage.xaml;
+Cart.xaml;MainWindow.xaml;OrderNumber.xaml;StartPage.xaml;
 
-False
+True
 

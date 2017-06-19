@@ -192,14 +192,23 @@ namespace WPF.Shop
             }
             mnozstviZbozi = pocetKusu;
 
-            Objednavka objednavka = new Objednavka();
+            /*Objednavka objednavka = new Objednavka();
             objednavka.IDzbozi = zboziObjednavky;
-            objednavka.mnozstviZbozi = mnozstviZbozi;
-            objednavka.IDuzivatele = Userid;
-            App.DatabazeObjednavek.SaveItemAsync(objednavka);
+            objednavka.mnozstviZbozi = mnozstviZbozi;*/
+            var zboziAjehoMnozstvi = zboziObjednavky.Zip(mnozstviZbozi, (z, m) => new { Zbozi = z, Mnozstvi = m });
+            foreach (var zm in zboziAjehoMnozstvi)
+            {
+                Objednavka objednavka = new Objednavka();
+                objednavka.IDzbozi = zm.Zbozi;
+                objednavka.mnozstviZbozi = zm.Mnozstvi;
+                objednavka.IDuzivatele = Userid;
+                App.DatabazeObjednavek.SaveItemAsync(objednavka);
+            }
+            /*objednavka.IDuzivatele = Userid;
+            App.DatabazeObjednavek.SaveItemAsync(objednavka);*/
 
-
-
+            /*NavigationService ns = NavigationService.GetNavigationService(this);
+            ns.Navigate(new OrderNumber(objednavka.ID));*/
         }
     }
 }
