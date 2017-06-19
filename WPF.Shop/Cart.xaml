@@ -12,8 +12,17 @@
         <Grid Background="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="98" />
+                <RowDefinition Height="50" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="40" />
+                <RowDefinition Height="50" />
             </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
@@ -27,9 +36,29 @@
                 </Grid.RowDefinitions>
 
                 <Image Source="Assets/logo.png" Grid.Column="0" Height="55" />
+                
+                
             </Grid>
 
-            <ListView x:Name="CartLV" Grid.Row="1" Background="White" SelectionChanged="CartLV_SelectionChanged" BorderBrush="Black" BorderThickness="2">
+            <Grid Grid.Row="1" Grid.ColumnSpan="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="600" />
+                    <ColumnDefinition Width="250" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="10" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Separator Grid.ColumnSpan="4" Grid.Row="0" />
+                <Label FontSize="16" Foreground="Black" Grid.Row="1" Grid.Column="0" Content="Název zboží" VerticalAlignment="Center" HorizontalAlignment="Left" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" />
+                <Label FontSize="16" Foreground="Black" Grid.Row="1" Grid.Column="1"  Content="Cena zboží" VerticalAlignment="Center" HorizontalAlignment="Left" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" />
+                <Label FontSize="16" Foreground="Black" Grid.Row="1" Grid.Column="2" Content="Počet kusů" VerticalAlignment="Center" HorizontalAlignment="Left" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" />
+                <Label Grid.Column="3" Grid.Row="1" Content="Odstranit ze seznamu" FontSize="16" Foreground="Black" VerticalAlignment="Center" HorizontalAlignment="Left" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" />
+            </Grid>
+
+            <ListView x:Name="CartLV" Grid.Row="2" Grid.ColumnSpan="5" Background="White" SelectionChanged="CartLV_SelectionChanged" BorderBrush="Black" BorderThickness="2">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Vertical"></StackPanel>
@@ -39,23 +68,81 @@
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="600" />
+                                <ColumnDefinition Width="250" />
+                                <ColumnDefinition Width="150" />
+                                <ColumnDefinition Width="25" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <Label FontSize="16" Foreground="White" Margin="10,0,0,0" Content="{Binding NazevZbozi}" VerticalAlignment="Center" HorizontalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
-                            <Label FontSize="16" Foreground="White" Margin="10,0,0,0" Content="{Binding Cena}" VerticalAlignment="Center" HorizontalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
-                            <Label FontSize="16" Foreground="White" Margin="10,0,0,0" Content="{Binding Mnozstvi}" VerticalAlignment="Center" HorizontalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" />
+                            <Label FontSize="16" Foreground="Black" Grid.Row="0" Grid.Column="0" Content="{Binding NazevZbozi}" VerticalAlignment="Center" HorizontalAlignment="Left" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" />
+                            <Label FontSize="16" Foreground="Black" Grid.Row="0" Grid.Column="1"  Content="{Binding Cena}" VerticalAlignment="Center" HorizontalAlignment="Left" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" />
+                            <Label FontSize="16" Foreground="Black" Grid.Row="0" Grid.Column="2" Content="{Binding Mnozstvi}" VerticalAlignment="Center" HorizontalAlignment="Left" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" />
+                            <Button Click="OdstranitZeSeznamu" Grid.Row="0" Grid.Column="3" Height="25" Tag="{Binding IDzbozi}">
+                                <Image Source="Assets/delete_button.png" />
+                            </Button>
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+
+            <Grid Grid.Row="3" Grid.ColumnSpan="1" Margin="0,40,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300" />
+                    <ColumnDefinition Width="300" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Label FontSize="20" Foreground="Black" Grid.Row="0" Grid.Column="0" Content="Kontaktní údaje" HorizontalAlignment="Left" HorizontalContentAlignment="Left" />
+                <Label Content="Jméno: " Grid.Row="1" FontSize="16" />
+                <Label Content="Příjmení: " Grid.Row="2" FontSize="16" />
+                <Label Content="Telefon: " Grid.Row="3" FontSize="16" />
+                <Label Content="Email: " Grid.Row="4" FontSize="16" />
+                <Label Content="* PIN: " Grid.Row="5" FontSize="16" />
+                <Label Content="Ulice a číslo popisné: " Grid.Row="6" FontSize="16" />
+                <Label Content="Obec: " Grid.Row="7" FontSize="16" />
+                <Label Content="PSČ: " Grid.Row="8" FontSize="16" />
+
+                <TextBox x:Name="jmeno" Grid.Row="1" Grid.Column="1" />
+                <TextBox x:Name="prijmeni" Grid.Row="2" Grid.Column="1" />
+                <TextBox x:Name="telefon" Grid.Row="3" Grid.Column="1" />
+                <TextBox x:Name="email" Grid.Row="4" Grid.Column="1" />
+                <TextBox x:Name="pin" Grid.Row="5" Grid.Column="1" />
+                <TextBox x:Name="ulice" Grid.Row="6" Grid.Column="1" />
+                <TextBox x:Name="obec" Grid.Row="7" Grid.Column="1" />
+                <TextBox x:Name="psc" Grid.Row="8" Grid.Column="1" />
+
+                <Label Grid.Row="90" Grid.ColumnSpan="9" Margin="10,20,0,0" Content="* USCHOVEJTE - slouží k ověření v případě stornování objednávky" />
+            </Grid>
+
+            <Grid Grid.Row="3" Grid.Column="2" Margin="20,40,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50" />
+                    <RowDefinition Height="25" />
+                    <RowDefinition Height="25" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Label FontSize="20" Foreground="Black" Grid.Row="0" Grid.Column="0" Content="Způsob dodání" HorizontalAlignment="Left" HorizontalContentAlignment="Left" />
+                <CheckBox Grid.Row="1" x:Name="DopravaCheckBox" FontSize="16" IsChecked="False" Content="Osobní odběr na pobočce v Praze (0 Kč)" Tag="1" Checked="DopravaCheckBox_Checked"/>
+                <CheckBox Grid.Row="2" x:Name="DopravaCheckBoxCP" FontSize="16" IsChecked="False" Content="Česká pošta - Do ruky (cena 110,- Kč)" Tag="2" Checked="DopravaCheckBoxCP_Checked"/>
+            </Grid>
+
+            <Label x:Name="celkovaCena" Grid.Column="1" Grid.Row="4" FontSize="19" HorizontalAlignment="Center" HorizontalContentAlignment="Center" />
+            <Button Click="SaveOrder" Content="Dokončit a uložit objednávku" Grid.Row="5" Margin="0,5,0,0" Grid.Column="0" Grid.ColumnSpan="2" Background="#D91F29" Foreground="White" BorderBrush="#97161D" BorderThickness="3" />
         </Grid>
     </ScrollViewer>
 </Page>

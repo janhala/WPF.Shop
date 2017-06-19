@@ -55,5 +55,33 @@ namespace WPF.Shop
                 return _cartDatabase;
             }
         }
+
+        private static DatabazeUzivatelu _databazeUzivatelu;
+        public static DatabazeUzivatelu DatabazeUzivatelu
+        {
+            get
+            {
+                if (_databazeUzivatelu == null)
+                {
+                    var fileHelper = new FileHelper();
+                    _databazeUzivatelu = new DatabazeUzivatelu(fileHelper.GetLocalFilePath("TodoSQLite.db3"));
+                }
+                return _databazeUzivatelu;
+            }
+        }
+
+        private static DatabazeObjednavek _databazeObjednavek;
+        public static DatabazeObjednavek DatabazeObjednavek
+        {
+            get
+            {
+                if (_databazeObjednavek == null)
+                {
+                    var fileHelper = new FileHelper();
+                    _databazeObjednavek = new DatabazeObjednavek(fileHelper.GetLocalFilePath("TodoSQLite.db3"));
+                }
+                return _databazeObjednavek;
+            }
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace WPF.Shop.Classes
     {
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
+        public int IDzbozi { get; set; }
         public string NazevZbozi { get; set; }
         public int Cena { get; set; }
         public int Mnozstvi { get; set; }

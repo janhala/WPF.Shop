@@ -27,6 +27,7 @@ namespace WPF.Shop.Pages
         List<int> KosikList = new List<int>();
         int celkovaCenaZbozi;
         int pocetKusuZbozi;
+        int cartClickAllowed;
         public StartPage()
         {
             InitializeComponent();
@@ -41,6 +42,33 @@ namespace WPF.Shop.Pages
             var queryofproducts = App.DatabazeZbozi.GetItemsNotDoneAsync().Result;
             ZboziLV.ItemsSource = queryofproducts;
 
+            var queryofcart = App.CartDatabase.GetItemsAsync().Result;
+            if (queryofcart.Count > 0)
+            {
+                int soucetCen = 0;
+                int soucetPoctuKusu = 0;
+                foreach (Kosik kosik in queryofcart)
+                {
+                    if (soucetCen == 0)
+                    {
+                        soucetCen = kosik.Cena;
+                    } else
+                    {
+                        soucetCen = kosik.Cena + soucetCen;
+                    }
+
+                    soucetPoctuKusu = +1;
+            }
+
+                kosikCena.Text = soucetCen + " Kč";
+                kosikPocetKusu.Text = soucetPoctuKusu.ToString() + " ks";
+
+                prazdnyKosik.Visibility = Visibility.Collapsed;
+                kosikCena.Visibility = Visibility.Visible;
+                kosikPocetKusu.Visibility = Visibility.Visible;
+
+                cartClickAllowed = 1;
+            }
             
         }
 
@@ -169,8 +197,12 @@ namespace WPF.Shop.Pages
 
         private void ZobrazitKosik(object sender, RoutedEventArgs e)
         {
-            NavigationService ns = NavigationService.GetNavigationService(this);
-            ns.Navigate(new Cart(KosikList));
+            if (KosikList.Count > 0 || cartClickAllowed == 1)
+            {
+                NavigationService ns = NavigationService.GetNavigationService(this);
+                ns.Navigate(new Cart(KosikList));
+            }
+            
         }
     }
 }

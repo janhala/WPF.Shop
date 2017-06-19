@@ -51,17 +51,27 @@ namespace WPF.Shop.Database
 
         public Task<List<Kosik>> AktualizovatPocetKusuZbozi(int id)
         {
-            return database.QueryAsync<Kosik>("UPDATE Kosik SET Mnozstvi = Mnozstvi + 1 WHERE ID = " + id );
+            return database.QueryAsync<Kosik>("UPDATE Kosik SET Mnozstvi = Mnozstvi + 1 WHERE IDzbozi = " + id );
         }
 
         public Task<List<Kosik>> GetbyID(int id)
         {
-            return database.QueryAsync<Kosik>("SELECT * FROM Kosik WHERE ID = " + id);
+            return database.QueryAsync<Kosik>("SELECT ID FROM Kosik WHERE IDzbozi = " + id);
+        }
+
+        public Task<List<Kosik>> GetNumberOfItemsInCart()
+        {
+            return database.QueryAsync<Kosik>("SELECT Mnozstvi FROM Kosik");
         }
 
         public Task<int> DeleteItemAsync(Kosik item)
         {
             return database.DeleteAsync(item);
+        }
+
+        public Task<List<Zbozi>> OdstranitZbozi(int idZbozi)
+        {
+            return database.QueryAsync<Zbozi>("DELETE FROM Kosik WHERE IDzbozi = " + idZbozi);
         }
     }
 }
