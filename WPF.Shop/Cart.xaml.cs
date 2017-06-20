@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -26,7 +27,7 @@ namespace WPF.Shop
         public int doprava { get; set; }
         public List<int> zboziObjednavky { get; set; }
         public List<int> mnozstviZbozi { get; set; }
-        public Cart(List<int> kosik)
+        public Cart(List<int> KosikList)
         {
             InitializeComponent();
 
@@ -34,47 +35,23 @@ namespace WPF.Shop
             List<int> zboziObjednavkyList = new List<int>();
             List<int> mnozstviZboziList = new List<int>();
 
-            if (kosik.Count > 1)
+            if (KosikList.Count > 0)
             {
-                foreach (int idZbozi in kosik)
+                // pouziti LINQ
+                var q = from x in KosikList
+                        group x by x into g
+                        let count = g.Count()
+                        orderby count descending
+                        select new { idZbozi = g.Key, Count = count };
+                foreach (var x in q)
                 {
-                    int idZboziExist = App.CartDatabase.GetbyID(idZbozi).Result.Count();
-                    if (idZboziExist < 1)
-                    {
-                        var queryofItems = App.DatabazeZbozi.GetItemAsyncByID(idZbozi).Result;
-
-                        Kosik cart = new Kosik();
-                        cart.IDzbozi = queryofItems.ID;
-                        cart.NazevZbozi = queryofItems.NazevZbozi;
-                        cart.Cena = queryofItems.Cena;
-                        cart.Mnozstvi = 1;
-                        App.CartDatabase.SaveItemAsync(cart);
-
-                        if (soucetCen == 0)
-                        {
-                            soucetCen = queryofItems.Cena;
-                        }
-                        else
-                        {
-                            soucetCen = queryofItems.Cena + soucetCen;
-                        }
-                    }
-                    else
-                    {
-                        App.CartDatabase.AktualizovatPocetKusuZbozi(idZbozi);
-
-                        var queryofItems = App.DatabazeZbozi.GetItemAsyncByID(idZbozi).Result;
-                        if (soucetCen == 0)
-                        {
-                            soucetCen = queryofItems.Cena;
-                        }
-                        else
-                        {
-                            soucetCen = queryofItems.Cena + soucetCen;
-                        }
-                    }
-
-                    zboziObjednavkyList.Add(idZbozi);
+                    var queryFromCart = App.DatabazeZbozi.GetItemAsyncByID(x.idZbozi).Result;
+                    Kosik cart = new Kosik();
+                    cart.IDzbozi = x.idZbozi;
+                    cart.NazevZbozi = queryFromCart.NazevZbozi;
+                    cart.Cena = queryFromCart.Cena;
+                    cart.Mnozstvi = x.Count;
+                    App.CartDatabase.SaveItemAsync(cart);
                 }
             } else {
                 var queryCart = App.CartDatabase.GetItemsAsync().Result;
@@ -93,12 +70,15 @@ namespace WPF.Shop
                     zboziObjednavkyList.Add(cart.IDzbozi);
                 }
 
-                    CartLV.ItemsSource = queryCart;
+                CartLV.ItemsSource = queryCart;
             }
             
             celkovaCena.Content = "Celková cena objednávky je " + soucetCen.ToString() + " Kč.";
 
             zboziObjednavky = zboziObjednavkyList;
+
+
+            this.Loaded += new RoutedEventHandler(LoadLV);
         }
 
         private void CartLV_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -108,9 +88,11 @@ namespace WPF.Shop
 
         private void OdstranitZeSeznamu(object sender, RoutedEventArgs e)
         {
-            //Zbozi zbozi = new Zbozi();
             int zboziKeSmazani = (int)(e.Source as Button).Tag;
             App.CartDatabase.OdstranitZbozi(zboziKeSmazani);
+
+            var queryCart = App.CartDatabase.GetItemsAsync().Result;
+            CartLV.ItemsSource = queryCart;
         }
 
         private void DopravaCheckBox_Checked(object sender, RoutedEventArgs e)
@@ -149,25 +131,6 @@ namespace WPF.Shop
 
         private void SaveOrder(object sender, RoutedEventArgs e)
         {
-            /*string mail;
-
-            var selectWhereMail = App.DatabazeUzivatelu.GetWhereEmail(email.Text).Result;
-            if (selectWhereMail.Count > 0)
-            {
-                selectWhereMail[0].Jmeno = ;
-                selectWhereMail[0].Prijmeni = prijmeni.Text;
-                selectWhereMail[0].Telefon = int.Parse(telefon.Text);
-                selectWhereMail[0].PIN = int.Parse(pin.Text);
-                selectWhereMail[0].UliceCP = ulice.Text;
-                selectWhereMail[0].Obec = obec.Text;
-                selectWhereMail[0].PSC = int.Parse(psc.Text);
-                App.DatabazeUzivatelu.SaveItemAsync(selectWhereMail[0]);
-
-                mail = selectWhereMail[0].Email;
-            } else
-            {*/
-            //}
-
             Uzivatel uzivatel = new Uzivatel();
             uzivatel.Jmeno = jmeno.Text;
             uzivatel.Prijmeni = prijmeni.Text;
@@ -180,8 +143,8 @@ namespace WPF.Shop
             App.DatabazeUzivatelu.SaveItemAsync(uzivatel);
 
 
-            var userIDsql = App.DatabazeUzivatelu.GetAllIDs().Result.First();
-            int Userid = userIDsql.ID;
+            var userIDsql = App.DatabazeUzivatelu.GetAllIDs().Result;
+            int Userid = userIDsql[0].ID;
 
             var mnozstviSQL = App.CartDatabase.GetNumberOfItemsInCart().Result;
             List<int> pocetKusu = new List<int>();
@@ -192,23 +155,40 @@ namespace WPF.Shop
             }
             mnozstviZbozi = pocetKusu;
 
-            /*Objednavka objednavka = new Objednavka();
-            objednavka.IDzbozi = zboziObjednavky;
-            objednavka.mnozstviZbozi = mnozstviZbozi;*/
             var zboziAjehoMnozstvi = zboziObjednavky.Zip(mnozstviZbozi, (z, m) => new { Zbozi = z, Mnozstvi = m });
+            Int32 randomNumber = 0;
+            Random rnd = new Random();
+            randomNumber = rnd.Next(1000, 99999);
             foreach (var zm in zboziAjehoMnozstvi)
             {
                 Objednavka objednavka = new Objednavka();
                 objednavka.IDzbozi = zm.Zbozi;
                 objednavka.mnozstviZbozi = zm.Mnozstvi;
                 objednavka.IDuzivatele = Userid;
+                objednavka.typDopravy = doprava;
+                objednavka.cisloObjednavky = randomNumber;
                 App.DatabazeObjednavek.SaveItemAsync(objednavka);
             }
-            /*objednavka.IDuzivatele = Userid;
-            App.DatabazeObjednavek.SaveItemAsync(objednavka);*/
 
-            /*NavigationService ns = NavigationService.GetNavigationService(this);
-            ns.Navigate(new OrderNumber(objednavka.ID));*/
+            App.CartDatabase.OdstranitVsechnoZbozi();
+
+            NavigationService ns = NavigationService.GetNavigationService(this);
+            ns.Navigate(new OrderNumber(randomNumber));
+        }
+
+        private void VyprazdnitKosik(object sender, RoutedEventArgs e)
+        {
+            App.CartDatabase.OdstranitVsechnoZbozi();
+
+            NavigationService ns = NavigationService.GetNavigationService(this);
+            ns.Navigate(new StartPage());
+        }
+
+        void LoadLV(object sender, RoutedEventArgs e)
+        {
+            var queryCart = App.CartDatabase.GetItemsAsync().Result;
+            CartLV.ItemsSource = queryCart;
         }
     }
+
 }

@@ -56,3 +56,5 @@ C:\Users\honza\Source\Repos\WPF.Shop2\WPF.Shop\obj\Debug\WPF.Shop.Properties.Res
 C:\Users\honza\Source\Repos\WPF.Shop2\WPF.Shop\obj\Debug\WPF.Shop.csproj.GenerateResource.Cache
 C:\Users\honza\Source\Repos\WPF.Shop2\WPF.Shop\obj\Debug\OrderNumber.g.cs
 C:\Users\honza\Source\Repos\WPF.Shop2\WPF.Shop\obj\Debug\OrderNumber.baml
+C:\Users\honza\Source\Repos\WPF.Shop2\WPF.Shop\obj\Debug\ViewOrder.g.cs
+C:\Users\honza\Source\Repos\WPF.Shop2\WPF.Shop\obj\Debug\ViewOrder.baml

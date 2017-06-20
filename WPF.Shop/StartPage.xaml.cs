@@ -57,7 +57,7 @@ namespace WPF.Shop.Pages
                         soucetCen = kosik.Cena + soucetCen;
                     }
 
-                    soucetPoctuKusu = +1;
+                    soucetPoctuKusu = kosik.Mnozstvi;
             }
 
                 kosikCena.Text = soucetCen + " Kč";
@@ -203,6 +203,12 @@ namespace WPF.Shop.Pages
                 ns.Navigate(new Cart(KosikList));
             }
             
+        }
+
+        private void ZobrazitObjednavku(object sender, RoutedEventArgs e)
+        {
+            NavigationService ns = NavigationService.GetNavigationService(this);
+            ns.Navigate(new ViewOrder());
         }
     }
 }

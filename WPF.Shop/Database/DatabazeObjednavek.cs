@@ -53,5 +53,15 @@ namespace WPF.Shop.Database
         {
             return database.DeleteAsync(item);
         }
+
+        public Task<List<Objednavka>> GetWhereOrderNumber(int orderNumber)
+        {
+            return database.QueryAsync<Objednavka>("SELECT * FROM Objednavka WHERE cisloObjednavky = " + orderNumber);
+        }
+
+        public Task<List<Objednavka>> StornovatObjednavku(int orderNumber)
+        {
+            return database.QueryAsync<Objednavka>("DELETE FROM Objednavka WHERE cisloObjednavky = " + orderNumber);
+        }
     }
 }

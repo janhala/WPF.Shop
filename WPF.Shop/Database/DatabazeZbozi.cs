@@ -36,6 +36,11 @@ namespace WPF.Shop.Database
             return database.QueryAsync<Zbozi>("SELECT * FROM Zbozi WHERE KategorieZbozi = " + kategorie);
         }
 
+        public Task<List<Zbozi>> GetWhereID(int id)
+        {
+            return database.QueryAsync<Zbozi>("SELECT NazevZbozi FROM Zbozi WHERE ID = " + id);
+        }
+
         // Query using LINQ
         public Task<Zbozi> GetItemAsync(string name)
         {

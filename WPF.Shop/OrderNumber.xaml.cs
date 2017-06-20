@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WPF.Shop.Pages;
 
 namespace WPF.Shop
 {
@@ -26,6 +27,12 @@ namespace WPF.Shop
 
             orderNumberLBL.Content = "Číslo vaší objednávky: " + orderNumber + "(automaticky zkopírováno do schránky)";
             Clipboard.SetText(orderNumber.ToString());
+        }
+
+        private void ToStartPage(object sender, RoutedEventArgs e)
+        {
+            NavigationService ns = NavigationService.GetNavigationService(this);
+            ns.Navigate(new StartPage());
         }
     }
 }

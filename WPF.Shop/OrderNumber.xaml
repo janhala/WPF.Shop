@@ -10,13 +10,15 @@
 
     <Grid Background="White">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
+            <RowDefinition Height="100" />
+            <RowDefinition Height="50" />
         </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Label Grid.Column="0" Grid.Row="0" x:Name="orderNumberLBL" />
+        <Label Grid.Column="0" Grid.Row="0" FontSize="20" x:Name="orderNumberLBL" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Center" HorizontalContentAlignment="Center" />
+        <Button Click="ToStartPage" Content="Vrátit se na hlavní stránku" Grid.Column="0" Grid.Row="1" FontSize="18" VerticalAlignment="Bottom" VerticalContentAlignment="Bottom" HorizontalAlignment="Center" HorizontalContentAlignment="Center" />
     </Grid>
 </Page>

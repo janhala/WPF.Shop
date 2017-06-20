@@ -134,11 +134,12 @@
                     <RowDefinition Height="50" />
                     <RowDefinition Height="25" />
                     <RowDefinition Height="25" />
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="70" />
                 </Grid.RowDefinitions>
                 <Label FontSize="20" Foreground="Black" Grid.Row="0" Grid.Column="0" Content="Způsob dodání" HorizontalAlignment="Left" HorizontalContentAlignment="Left" />
                 <CheckBox Grid.Row="1" x:Name="DopravaCheckBox" FontSize="16" IsChecked="False" Content="Osobní odběr na pobočce v Praze (0 Kč)" Tag="1" Checked="DopravaCheckBox_Checked"/>
                 <CheckBox Grid.Row="2" x:Name="DopravaCheckBoxCP" FontSize="16" IsChecked="False" Content="Česká pošta - Do ruky (cena 110,- Kč)" Tag="2" Checked="DopravaCheckBoxCP_Checked"/>
+                <Button Grid.Row="3" Margin="5,30,5,0" Background="Red" Foreground="White" Content="Vyprázdnit košík" Click="VyprazdnitKosik" />
             </Grid>
 
             <Label x:Name="celkovaCena" Grid.Column="1" Grid.Row="4" FontSize="19" HorizontalAlignment="Center" HorizontalContentAlignment="Center" />

@@ -69,9 +69,14 @@ namespace WPF.Shop.Database
             return database.DeleteAsync(item);
         }
 
-        public Task<List<Zbozi>> OdstranitZbozi(int idZbozi)
+        public Task<List<Kosik>> OdstranitZbozi(int idZbozi)
         {
-            return database.QueryAsync<Zbozi>("DELETE FROM Kosik WHERE IDzbozi = " + idZbozi);
+            return database.QueryAsync<Kosik>("DELETE FROM Kosik WHERE IDzbozi = " + idZbozi);
+        }
+
+        public Task<List<Kosik>> OdstranitVsechnoZbozi()
+        {
+            return database.QueryAsync<Kosik>("DELETE FROM Kosik");
         }
     }
 }

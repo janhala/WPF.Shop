@@ -38,7 +38,7 @@ namespace WPF.Shop.Database
 
         public Task<List<Uzivatel>> GetAllIDs()
         {
-            return database.QueryAsync<Uzivatel>("SELECT ID FROM Uzivatel");
+            return database.QueryAsync<Uzivatel>("SELECT ID FROM Uzivatel ORDER BY ID DESC");
         }
 
         // Query using LINQ
@@ -62,6 +62,12 @@ namespace WPF.Shop.Database
         public Task<int> DeleteItemAsync(Uzivatel item)
         {
             return database.DeleteAsync(item);
+        }
+
+        //SELECT PIN FROM Uzivatel INNER JOIN Objednavka ON Objednavka.IDuzivatele = Uzivatel.ID WHERE CisloObjednavky = 44467 LIMIT 1;
+        public Task<List<Uzivatel>> CheckPIN(int orderNumber)
+        {
+            return database.QueryAsync<Uzivatel>("SELECT PIN FROM Uzivatel INNER JOIN Objednavka ON Objednavka.IDuzivatele = Uzivatel.ID WHERE CisloObjednavky = " + orderNumber + " LIMIT 1");
         }
     }
 }
