@@ -31,6 +31,11 @@ namespace WPF.Shop.Database
             return database.QueryAsync<Objednavka>("SELECT * FROM Objednavka");
         }
 
+        public Task<List<Objednavka>> CheckIfOrderNumberExist(int orderNumber)
+        {
+            return database.QueryAsync<Objednavka>("SELECT cisloObjednavky FROM Objednavka WHERE cisloObjednavky = " + orderNumber);
+        }
+
         // Query using LINQ
         public Task<Objednavka> GetItemAsync(int id)
         {

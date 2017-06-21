@@ -51,6 +51,14 @@ namespace WPF.Shop
                     cart.NazevZbozi = queryFromCart.NazevZbozi;
                     cart.Cena = queryFromCart.Cena;
                     cart.Mnozstvi = x.Count;
+                    if (soucetCen == 0)
+                    {
+                        soucetCen = cart.Cena;
+                    }
+                    else
+                    {
+                        soucetCen = cart.Cena + soucetCen;
+                    }
                     App.CartDatabase.SaveItemAsync(cart);
                 }
             } else {
