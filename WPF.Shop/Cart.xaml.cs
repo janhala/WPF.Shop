@@ -163,14 +163,13 @@ namespace WPF.Shop
             }
             mnozstviZbozi = pocetKusu;
 
-            var zboziAjehoMnozstvi = zboziObjednavky.Zip(mnozstviZbozi, (z, m) => new { Zbozi = z, Mnozstvi = m });
             Int32 randomNumber = 0;
             Random rnd = new Random();
             randomNumber = rnd.Next(1000, 99999);
-            foreach (var zm in zboziAjehoMnozstvi)
+            foreach (Kosik zm in CartLV.ItemsSource)
             {
                 Objednavka objednavka = new Objednavka();
-                objednavka.IDzbozi = zm.Zbozi;
+                objednavka.IDzbozi = zm.IDzbozi;
                 objednavka.mnozstviZbozi = zm.Mnozstvi;
                 objednavka.IDuzivatele = Userid;
                 objednavka.typDopravy = doprava;

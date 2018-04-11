@@ -4,11 +4,11 @@
 winexe
 C#
 .cs
-C:\SHOP_test\WPF.Shop\obj\Debug\
+C:\SHOP_test\WPF.Shop\obj\Release\
 WPF.Shop
 none
 false
-DEBUG;TRACE
+TRACE
 C:\SHOP_test\WPF.Shop\App.xaml
 51422874895
 2-776728924
@@ -16,5 +16,5 @@ C:\SHOP_test\WPF.Shop\App.xaml
 73-1058473103
 Cart.xaml;MainWindow.xaml;OrderNumber.xaml;StartPage.xaml;ViewOrder.xaml;
 
-False
+True
 
