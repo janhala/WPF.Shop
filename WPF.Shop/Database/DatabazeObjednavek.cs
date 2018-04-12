@@ -1,7 +1,11 @@
-﻿using SQLite;
+﻿using Newtonsoft.Json;
+using RestSharp;
+using RestSharp.Deserializers;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using WPF.Shop.Classes;
@@ -42,16 +46,20 @@ namespace WPF.Shop.Database
             return database.Table<Objednavka>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
 
+        //offline
         public Task<int> SaveItemAsync(Objednavka item)
         {
-            if (item.ID != 0)
-            {
-                return database.UpdateAsync(item);
-            }
-            else
-            {
-                return database.InsertAsync(item);
-            }
+            return database.InsertAsync(item);
+        }
+        //online
+        public void SaveItemRest(Objednavka item)
+        {
+            var restClient = new RestClient(App.apiURL + "?saveNewOrder");
+            var restRequest = new RestRequest(Method.POST);
+            string json = JsonConvert.SerializeObject(item);
+            restRequest.AddParameter("application/json", json, ParameterType.RequestBody);
+            restRequest.RequestFormat = DataFormat.Json;
+            var response = restClient.Execute(restRequest);
         }
 
         public Task<int> DeleteItemAsync(Objednavka item)
@@ -59,14 +67,48 @@ namespace WPF.Shop.Database
             return database.DeleteAsync(item);
         }
 
+        //offline
         public Task<List<Objednavka>> GetWhereOrderNumber(int orderNumber)
         {
             return database.QueryAsync<Objednavka>("SELECT * FROM Objednavka WHERE cisloObjednavky = " + orderNumber);
         }
+        //online
+        public List<Objednavka> GetWhereOrderNumberRest(int orderNumber)
+        {
+            var client = new RestClient(App.apiURL + "?GetWhereOrderNumber");
+            var request = new RestRequest(Method.GET);
+            request.AddParameter("cisloObjednavky", orderNumber);
+            var response = client.Execute<List<Objednavka>>(request);
 
+            JsonDeserializer deserializer = new JsonDeserializer();
+            var data = deserializer.Deserialize<List<Objednavka>>(response);
+
+            List<Objednavka> objednavka = new List<Objednavka>();
+            objednavka = data;
+
+            return objednavka;
+        }
+
+        //offline
         public Task<List<Objednavka>> StornovatObjednavku(int orderNumber)
         {
             return database.QueryAsync<Objednavka>("DELETE FROM Objednavka WHERE cisloObjednavky = " + orderNumber);
+        }
+        //online
+        public List<Objednavka> StornovatObjednavkuRest(int orderNumber)
+        {
+            var client = new RestClient(App.apiURL + "?StornovatObjednavku");
+            var request = new RestRequest(Method.DELETE);
+            request.AddParameter("cisloObjednavky", orderNumber);
+            var response = client.Execute<List<Objednavka>>(request);
+
+            JsonDeserializer deserializer = new JsonDeserializer();
+            var data = deserializer.Deserialize<List<Objednavka>>(response);
+
+            List<Objednavka> objednavka = new List<Objednavka>();
+            objednavka = data;
+
+            return objednavka;
         }
     }
 }

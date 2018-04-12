@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WPF.Shop.Classes;
 
 namespace WPF.Shop
 {
@@ -31,7 +32,8 @@ namespace WPF.Shop
             int orderNumber = 0;
             Int32.TryParse(cisloObjednavky.Text, out orderNumber);
 
-            var getOrderItems = App.DatabazeObjednavek.GetWhereOrderNumber(orderNumber).Result;
+            //GetWhereOrderNumberRest
+            List<Objednavka> getOrderItems = getOrderItems = App.DatabazeObjednavek.GetWhereOrderNumberRest(orderNumber);
 
             if (getOrderItems.Count < 1)
             {
@@ -42,9 +44,7 @@ namespace WPF.Shop
             {
                 pinLBL.Visibility = Visibility.Collapsed;
                 objednavkaLV.ItemsSource = getOrderItems;
-            }
-
-            
+            }            
         }
 
         private void ZobrazitPIN(object sender, RoutedEventArgs e)
@@ -57,22 +57,43 @@ namespace WPF.Shop
 
         private void StornovatObjednavku(object sender, RoutedEventArgs e)
         {
-            var sqlPIN = App.DatabazeUzivatelu.CheckPIN(int.Parse(cisloObjednavky.Text)).Result;
-            if (sqlPIN[0].PIN == int.Parse(pin.Text))
+            if (cisloObjednavky.Text != null && cisloObjednavky.Text != "")
             {
-                App.DatabazeObjednavek.StornovatObjednavku(int.Parse(cisloObjednavky.Text));
+                List<Uzivatel> sqlPIN;
+                if (App.CheckForInternetConnection() == true)
+                {
+                    sqlPIN = App.DatabazeUzivatelu.CheckPINRest(int.Parse(cisloObjednavky.Text));
+                }
+                else
+                {
+                    sqlPIN = App.DatabazeUzivatelu.CheckPIN(int.Parse(cisloObjednavky.Text)).Result;
+                }
+                 
+                if (sqlPIN[0].PIN == int.Parse(pin.Text))
+                {
+                    if (App.CheckForInternetConnection() == true)
+                    {
+                        App.DatabazeObjednavek.StornovatObjednavkuRest(int.Parse(cisloObjednavky.Text));
+                    } else
+                    {
+                        App.DatabazeObjednavek.StornovatObjednavku(int.Parse(cisloObjednavky.Text));
+                    }
 
-                pinLBL.Visibility = Visibility.Visible;
-                pinLBL.Content = "Úspěšně stornováno, těšíme se na další nákup :)";
-                pin.Visibility = Visibility.Collapsed;
-                pinBTN.Visibility = Visibility.Collapsed;
+                    pinLBL.Visibility = Visibility.Visible;
+                    pinLBL.Content = "Úspěšně stornováno, těšíme se na další nákup :)";
+                    pin.Visibility = Visibility.Collapsed;
+                    pinBTN.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    pinLBL.Visibility = Visibility.Visible;
+                    pinLBL.Content = "Zadejte PIN znovu, zadaný PIN nesouhlasí: ";
+                }
             } else
             {
                 pinLBL.Visibility = Visibility.Visible;
-                pinLBL.Content = "Zadejte PIN znovu, zadaný PIN nesouhlasí: ";
-            }
-
-            
+                pinLBL.Content = "Objednávka s tímto číslem neexistuje!!";
+            }            
         }
     }
 }

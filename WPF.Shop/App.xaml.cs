@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using WPF.Shop.Database;
@@ -14,6 +15,37 @@ namespace WPF.Shop
     /// </summary>
     public partial class App : Application
     {
+        public static bool CheckForInternetConnection()
+        {
+            try
+            {
+                using (var client = new WebClient())
+                using (client.OpenRead("http://clients3.google.com/generate_204"))
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static string apiURL = "https://student.sps-prosek.cz/~halaja14/eshop/wpf_shop_api.php";
+        private static DatabazeObjednavkaZbozi _databazeObjednavkaZbozi;
+        public static DatabazeObjednavkaZbozi DatabazeObjednavkaZbozi
+        {
+            get
+            {
+                if (_databazeObjednavkaZbozi == null)
+                {
+                    var fileHelper = new FileHelper();
+                    _databazeObjednavkaZbozi = new DatabazeObjednavkaZbozi(fileHelper.GetLocalFilePath("TodoSQLite.db3"));
+                }
+                return _databazeObjednavkaZbozi;
+            }
+        }
+
         private static DatabazeKategorii _databazeKategorii;
         public static DatabazeKategorii DatabazeKategorii
         {

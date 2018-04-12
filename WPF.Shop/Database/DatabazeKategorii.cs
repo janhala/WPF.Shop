@@ -1,4 +1,6 @@
-﻿using SQLite;
+﻿using RestSharp;
+using RestSharp.Deserializers;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +22,24 @@ namespace WPF.Shop.Database
         }
 
         // Query
+        //offline
         public Task<List<Kategorie>> GetItemsAsync()
         {
             return database.Table<Kategorie>().ToListAsync();
+        }
+        //online
+        public List<Kategorie> GetItemsRest()
+        {
+            var client = new RestClient(App.apiURL + "?getAllCategories");
+            var request = new RestRequest(Method.GET);
+            var response = client.Execute<List<Kategorie>>(request);
+
+            JsonDeserializer deserializer = new JsonDeserializer();
+            var data = deserializer.Deserialize<List<Kategorie>>(response);
+
+            List<Kategorie> orders = new List<Kategorie>();
+            orders = data;
+            return orders;
         }
 
         // Query using SQL query string

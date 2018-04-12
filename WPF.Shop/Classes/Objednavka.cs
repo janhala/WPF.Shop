@@ -13,8 +13,6 @@ namespace WPF.Shop.Classes
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; } //slouzi jako CISLO OBJEDNAVKY
         public int IDuzivatele { get; set; }
-        public int IDzbozi { get; set; }
-        public int mnozstviZbozi { get; set; }
         public int cisloObjednavky { get; set; }
         public int typDopravy { get; set; } //1 == osobni odber, 2 == posta
 
@@ -29,9 +27,10 @@ namespace WPF.Shop.Classes
                 doprava = "Poslat Českou poštou";
             }
 
-            var getNazevZbozSQL = App.DatabazeZbozi.GetWhereID(IDzbozi).Result;
+            var zbozi = App.DatabazeObjednavkaZbozi.GetWhereOrderIdRest(ID);
+            var getNazevZbozSQL = App.DatabazeZbozi.GetWhereID(zbozi[0].IDzbozi).Result;
 
-            return "Název zboží: " + getNazevZbozSQL[0].NazevZbozi + " | Množství zboží: " + mnozstviZbozi + " | Typ dopravy: " + doprava;
+            return "Název zboží: " + getNazevZbozSQL[0].NazevZbozi + " | Množství zboží: " + zbozi[0].mnozstviZbozi + " | Typ dopravy: " + doprava;
         }
     }
 }

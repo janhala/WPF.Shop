@@ -1,4 +1,7 @@
-﻿using SQLite;
+﻿using Newtonsoft.Json;
+using RestSharp;
+using RestSharp.Deserializers;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,9 +39,29 @@ namespace WPF.Shop.Database
             return database.QueryAsync<Uzivatel>("SELECT * FROM Uzivatel WHERE Email = " + email);
         }
 
+        //offline
         public Task<List<Uzivatel>> GetAllIDs()
         {
             return database.QueryAsync<Uzivatel>("SELECT ID FROM Uzivatel ORDER BY ID DESC");
+        }
+        //online
+        public List<Uzivatel> GetAllIDsRest()
+        {
+            var client = new RestClient(App.apiURL + "?GetAllIDs");
+            var request = new RestRequest(Method.GET);
+            var response = client.Execute<List<Uzivatel>>(request);
+
+            List<Uzivatel> ids = null;
+            if (response.Data != null)
+            {
+                JsonDeserializer deserializer = new JsonDeserializer();
+                var data = deserializer.Deserialize<List<Uzivatel>>(response);
+
+                ids = new List<Uzivatel>();
+                ids = data;
+            }
+            
+            return ids;
         }
 
         // Query using LINQ
@@ -47,16 +70,20 @@ namespace WPF.Shop.Database
             return database.Table<Uzivatel>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
 
+        //offline
         public Task<int> SaveItemAsync(Uzivatel item)
         {
-            if (item.ID != 0)
-            {
-                return database.UpdateAsync(item);
-            }
-            else
-            {
-                return database.InsertAsync(item);
-            }
+            return database.InsertAsync(item);
+        }
+        //online
+        public void SaveItemRest(Uzivatel item)
+        {
+            var restClient = new RestClient(App.apiURL + "?saveNewUser");
+            var restRequest = new RestRequest(Method.POST);
+            string json = JsonConvert.SerializeObject(item);
+            restRequest.AddParameter("application/json", json, ParameterType.RequestBody);
+            restRequest.RequestFormat = DataFormat.Json;
+            var response = restClient.Execute(restRequest);
         }
 
         public Task<int> DeleteItemAsync(Uzivatel item)
@@ -64,10 +91,25 @@ namespace WPF.Shop.Database
             return database.DeleteAsync(item);
         }
 
-        //SELECT PIN FROM Uzivatel INNER JOIN Objednavka ON Objednavka.IDuzivatele = Uzivatel.ID WHERE CisloObjednavky = 44467 LIMIT 1;
+        //offline
         public Task<List<Uzivatel>> CheckPIN(int orderNumber)
         {
             return database.QueryAsync<Uzivatel>("SELECT PIN FROM Uzivatel INNER JOIN Objednavka ON Objednavka.IDuzivatele = Uzivatel.ID WHERE CisloObjednavky = " + orderNumber + " LIMIT 1");
+        }
+        //online
+        public List<Uzivatel> CheckPINRest(int orderNumber)
+        {
+            var client = new RestClient(App.apiURL + "?CheckPIN");
+            var request = new RestRequest(Method.GET);
+            var response = client.Execute<List<Uzivatel>>(request);
+
+            JsonDeserializer deserializer = new JsonDeserializer();
+            var data = deserializer.Deserialize<List<Uzivatel>>(response);
+
+            List<Uzivatel> usersPinList = new List<Uzivatel>();
+            usersPinList = data;
+
+            return usersPinList;
         }
     }
 }

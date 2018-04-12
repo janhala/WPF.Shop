@@ -1,4 +1,6 @@
-﻿using SQLite;
+﻿using RestSharp;
+using RestSharp.Deserializers;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,14 +28,45 @@ namespace WPF.Shop.Database
         }
 
         // Query using SQL query string
+        //offline
         public Task<List<Zbozi>> GetItemsNotDoneAsync()
         {
             return database.QueryAsync<Zbozi>("SELECT * FROM Zbozi");
         }
+        //online
+        public List<Zbozi> GetItemsRest()
+        {
+            var client = new RestClient(App.apiURL + "?getAllProducts");
+            var request = new RestRequest(Method.GET);
+            var response = client.Execute<List<Zbozi>>(request);
 
+            JsonDeserializer deserializer = new JsonDeserializer();
+            var data = deserializer.Deserialize<List<Zbozi>>(response);
+
+            List<Zbozi> products = new List<Zbozi>();
+            products = data;
+            return products;
+        }
+
+        //offline
         public Task<List<Zbozi>> GetWhereCategoryIs(int kategorie)
         {
             return database.QueryAsync<Zbozi>("SELECT * FROM Zbozi WHERE KategorieZbozi = " + kategorie);
+        }
+        //online
+        public List<Zbozi> GetWhereCategoryIsRest(int kategorie)
+        {
+            var client = new RestClient(App.apiURL + "?getProductsWhereCategoryIs");
+            var request = new RestRequest(Method.GET);
+            request.AddParameter("category", kategorie);
+            var response = client.Execute<List<Zbozi>>(request);
+
+            JsonDeserializer deserializer = new JsonDeserializer();
+            var data = deserializer.Deserialize<List<Zbozi>>(response);
+
+            List<Zbozi> products = new List<Zbozi>();
+            products = data;
+            return products;
         }
 
         public Task<List<Zbozi>> GetWhereID(int id)
@@ -48,12 +81,28 @@ namespace WPF.Shop.Database
         }
 
         // Query using LINQ
+        //online
         public Task<Zbozi> GetItemAsyncByID(int id)
         {
             return database.Table<Zbozi>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
+        //offline
+        public Zbozi GetItemByIDRest(int id)
+        {
+            var client = new RestClient(App.apiURL + "?GetWhereIDIs");
+            var request = new RestRequest(Method.GET);
+            request.AddParameter("productID", id);
+            var response = client.Execute<Zbozi>(request);
 
-        public Task<int> SaveItemAsync(Zbozi item)
+            JsonDeserializer deserializer = new JsonDeserializer();
+            var data = deserializer.Deserialize<Zbozi>(response);
+
+            Zbozi products = new Zbozi();
+            products = data;
+            return products;
+        }
+
+        /*public Task<int> SaveItemAsync(Zbozi item) 
         {
             if (item.ID != 0)
             {
@@ -63,6 +112,11 @@ namespace WPF.Shop.Database
             {
                 return database.InsertAsync(item);
             }
+        }*/
+        public Task<int> SaveItemAsync(Zbozi item)
+        {
+
+            return database.InsertAsync(item);
         }
 
         public Task<int> DeleteItemAsync(Zbozi item)

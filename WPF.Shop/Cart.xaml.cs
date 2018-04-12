@@ -45,7 +45,8 @@ namespace WPF.Shop
                         select new { idZbozi = g.Key, Count = count };
                 foreach (var x in q)
                 {
-                    var queryFromCart = App.DatabazeZbozi.GetItemAsyncByID(x.idZbozi).Result;
+                    Zbozi queryFromCart = App.DatabazeZbozi.GetItemByIDRest(x.idZbozi);
+                    
                     Kosik cart = new Kosik();
                     cart.IDzbozi = x.idZbozi;
                     cart.NazevZbozi = queryFromCart.NazevZbozi;
@@ -139,48 +140,68 @@ namespace WPF.Shop
 
         private void SaveOrder(object sender, RoutedEventArgs e)
         {
-            Uzivatel uzivatel = new Uzivatel();
-            uzivatel.Jmeno = jmeno.Text;
-            uzivatel.Prijmeni = prijmeni.Text;
-            uzivatel.Telefon = Int32.Parse(telefon.Text);
-            uzivatel.Email = email.Text;
-            uzivatel.PIN = Int32.Parse(pin.Text);
-            uzivatel.UliceCP = ulice.Text;
-            uzivatel.Obec = obec.Text;
-            uzivatel.PSC = Int32.Parse(psc.Text);
-            App.DatabazeUzivatelu.SaveItemAsync(uzivatel);
-
-
-            var userIDsql = App.DatabazeUzivatelu.GetAllIDs().Result;
-            int Userid = userIDsql[0].ID;
-
-            var mnozstviSQL = App.CartDatabase.GetNumberOfItemsInCart().Result;
-            List<int> pocetKusu = new List<int>();
-            foreach (Kosik kosik in mnozstviSQL)
+            if (jmeno.Text != null && jmeno.Text != "" || prijmeni.Text != null && prijmeni.Text != "" || telefon.Text != null && telefon.Text != "" || email.Text != null && email.Text != "" ||
+                pin.Text != null && pin.Text != "" || ulice.Text != null && ulice.Text != "" || obec.Text != null && obec.Text != "" || psc.Text != null && psc.Text != "")
             {
-                int mnozstvi = kosik.Mnozstvi;
-                pocetKusu.Add(mnozstvi);
-            }
-            mnozstviZbozi = pocetKusu;
+                Uzivatel uzivatel = new Uzivatel();
+                uzivatel.Jmeno = jmeno.Text;
+                uzivatel.Prijmeni = prijmeni.Text;
+                uzivatel.Telefon = Int32.Parse(telefon.Text);
+                uzivatel.Email = email.Text;
+                uzivatel.PIN = Int32.Parse(pin.Text);
+                uzivatel.UliceCP = ulice.Text;
+                uzivatel.Obec = obec.Text;
+                uzivatel.PSC = Int32.Parse(psc.Text);
+                App.DatabazeUzivatelu.SaveItemRest(uzivatel);
 
-            Int32 randomNumber = 0;
-            Random rnd = new Random();
-            randomNumber = rnd.Next(1000, 99999);
-            foreach (Kosik zm in CartLV.ItemsSource)
-            {
+                List<Uzivatel> userIDsql = App.DatabazeUzivatelu.GetAllIDsRest();
+                int Userid;
+                if (userIDsql == null)
+                {
+                    Userid = 1;
+                } else
+                {
+                    Userid = userIDsql[0].ID;
+                }
+
+                var mnozstviSQL = App.CartDatabase.GetNumberOfItemsInCart().Result;
+                List<int> pocetKusu = new List<int>();
+                foreach (Kosik kosik in mnozstviSQL)
+                {
+                    int mnozstvi = kosik.Mnozstvi;
+                    pocetKusu.Add(mnozstvi);
+                }
+                mnozstviZbozi = pocetKusu;
+
+                Int32 randomNumber = 0;
+                Random rnd = new Random();
+                randomNumber = rnd.Next(1000, 99999);
                 Objednavka objednavka = new Objednavka();
-                objednavka.IDzbozi = zm.IDzbozi;
-                objednavka.mnozstviZbozi = zm.Mnozstvi;
                 objednavka.IDuzivatele = Userid;
                 objednavka.typDopravy = doprava;
                 objednavka.cisloObjednavky = randomNumber;
-                App.DatabazeObjednavek.SaveItemAsync(objednavka);
+                App.DatabazeObjednavek.SaveItemRest(objednavka);
+                var lastInsertedOrder = App.DatabazeObjednavek.GetWhereOrderNumberRest(randomNumber);
+                int orderID = lastInsertedOrder[0].ID;
+
+
+                foreach (Kosik zm in CartLV.ItemsSource)
+                {
+                    Objednavka_Zbozi objednavka_Zbozi = new Objednavka_Zbozi();
+                    objednavka_Zbozi.IDobjednavky = orderID;
+                    objednavka_Zbozi.IDzbozi = zm.IDzbozi;
+                    objednavka_Zbozi.mnozstviZbozi = zm.Mnozstvi;
+                    App.DatabazeObjednavkaZbozi.SaveItemRest(objednavka_Zbozi);
+                }
+
+                App.CartDatabase.OdstranitVsechnoZbozi();
+
+                NavigationService ns = NavigationService.GetNavigationService(this);
+                ns.Navigate(new OrderNumber(randomNumber));
+            } else
+            {
+                MessageBox.Show("Vyplňte všechny údaje.");
             }
-
-            App.CartDatabase.OdstranitVsechnoZbozi();
-
-            NavigationService ns = NavigationService.GetNavigationService(this);
-            ns.Navigate(new OrderNumber(randomNumber));
         }
 
         private void VyprazdnitKosik(object sender, RoutedEventArgs e)

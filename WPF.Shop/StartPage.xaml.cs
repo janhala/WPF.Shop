@@ -15,6 +15,8 @@ using System.Windows.Shapes;
 using WPF.Shop.Classes;
 using WPF.Shop.Database;
 using System.Diagnostics;
+using RestSharp;
+using RestSharp.Deserializers;
 
 namespace WPF.Shop.Pages
 {
@@ -35,13 +37,36 @@ namespace WPF.Shop.Pages
             PridatKategorieZbozi();
             PridatProdukty();
 
-
-            var queryofcategories = App.DatabazeKategorii.GetItemsNotDoneAsync().Result;
+            /*
+             * ziskani kategorii
+             */
+            List<Kategorie> queryofcategories;
+            if (App.CheckForInternetConnection() == false)
+            {
+                queryofcategories = App.DatabazeKategorii.GetItemsNotDoneAsync().Result;
+            } else
+            {
+                queryofcategories = App.DatabazeKategorii.GetItemsRest();
+            }
             KategorieLV.ItemsSource = queryofcategories;
 
-            var queryofproducts = App.DatabazeZbozi.GetItemsNotDoneAsync().Result;
+            /*
+             * ziskani zbozi
+             */
+            List<Zbozi> queryofproducts;
+            if (App.CheckForInternetConnection() == false)
+            {
+                queryofproducts = App.DatabazeZbozi.GetItemsNotDoneAsync().Result;
+            }
+            else
+            {
+                queryofproducts = App.DatabazeZbozi.GetItemsRest();
+            }
             ZboziLV.ItemsSource = queryofproducts;
 
+            /*
+             * ziskani polozek v kosiku
+             */
             var queryofcart = App.CartDatabase.GetItemsAsync().Result;
             if (queryofcart.Count > 0)
             {
@@ -74,14 +99,22 @@ namespace WPF.Shop.Pages
 
         private void KategorieLV_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            var item = KategorieLV.SelectedItem as Kategorie;
+            int kategorieZbozi = item.ID;
+
+            List<Zbozi> queryofproducts;
             if (KategorieLV.SelectedItem != null)
             {
-                var item = KategorieLV.SelectedItem as Kategorie;
-                int kategorieZbozi = item.ID;
+                if (App.CheckForInternetConnection() == false)
+                {
+                    queryofproducts = App.DatabazeZbozi.GetWhereCategoryIs(kategorieZbozi).Result;
+                }
+                else
+                {
+                    queryofproducts = App.DatabazeZbozi.GetWhereCategoryIsRest(kategorieZbozi);
+                }
 
-                var queryofproducts = App.DatabazeZbozi.GetWhereCategoryIs(kategorieZbozi).Result;
                 ZboziLV.ItemsSource = queryofproducts;
-
             }
 
             
