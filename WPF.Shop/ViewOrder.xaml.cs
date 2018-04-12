@@ -33,7 +33,7 @@ namespace WPF.Shop
 
             if (orderNumber != 0)
             {
-                List<Objednavka> getOrderItems = getOrderItems = App.DatabazeObjednavek.GetWhereOrderNumberRest(orderNumber);
+                List<Objednavka> getOrderItems = App.DatabazeObjednavek.GetWhereOrderNumberRest(orderNumber);
 
                 if (getOrderItems != null)
                 {
