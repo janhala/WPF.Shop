@@ -17,6 +17,7 @@ using WPF.Shop.Database;
 using System.Diagnostics;
 using RestSharp;
 using RestSharp.Deserializers;
+using System.IO;
 
 namespace WPF.Shop.Pages
 {
@@ -34,8 +35,11 @@ namespace WPF.Shop.Pages
         {
             InitializeComponent();
 
-            PridatKategorieZbozi();
-            PridatProdukty();
+            /*PridatKategorieZbozi();
+            PridatProdukty();*/
+
+            SynchronizovatLokalniDatabaziAsync();
+
 
             /*
              * ziskani kategorii
@@ -190,58 +194,114 @@ namespace WPF.Shop.Pages
 
         private void PridatDoKosiku(object sender, RoutedEventArgs e)
         {
-            if (ZboziLV.SelectedItem != null)
+            if (App.CheckForInternetConnection() == true)
             {
-                if (KosikList.Count == 0)
+                if (ZboziLV.SelectedItem != null)
                 {
-                    prazdnyKosik.Visibility = Visibility.Collapsed;
-                    kosikCena.Visibility = Visibility.Visible;
-                    kosikPocetKusu.Visibility = Visibility.Visible;
+                    if (KosikList.Count == 0)
+                    {
+                        prazdnyKosik.Visibility = Visibility.Collapsed;
+                        kosikCena.Visibility = Visibility.Visible;
+                        kosikPocetKusu.Visibility = Visibility.Visible;
+                    }
+
+                    var item = ZboziLV.SelectedItem as Zbozi;
+                    int idZbozi = item.ID;
+
+                    KosikList.Add(idZbozi);
+
+                    if (celkovaCenaZbozi == 0)
+                    {
+                        celkovaCenaZbozi = item.Cena;
+                    }
+                    else
+                    {
+                        celkovaCenaZbozi = celkovaCenaZbozi + item.Cena;
+                    }
+
+                    kosikCena.Text = celkovaCenaZbozi.ToString() + " Kč";
+
+
+                    if (pocetKusuZbozi == 0)
+                    {
+                        pocetKusuZbozi = 1;
+                    }
+                    else
+                    {
+                        pocetKusuZbozi = pocetKusuZbozi + 1;
+                    }
+
+                    kosikPocetKusu.Text = pocetKusuZbozi.ToString() + " ks";
                 }
-
-                var item = ZboziLV.SelectedItem as Zbozi;
-                int idZbozi = item.ID;
-
-                KosikList.Add(idZbozi);                
-
-                if (celkovaCenaZbozi == 0)
-                {
-                    celkovaCenaZbozi = item.Cena;
-                } else
-                {
-                    celkovaCenaZbozi = celkovaCenaZbozi + item.Cena;
-                }
-
-                kosikCena.Text = celkovaCenaZbozi.ToString() + " Kč";
-                
-
-                if (pocetKusuZbozi == 0)
-                {
-                    pocetKusuZbozi = 1;
-                }
-                else
-                {
-                    pocetKusuZbozi = pocetKusuZbozi + 1;
-                }
-
-                kosikPocetKusu.Text = pocetKusuZbozi.ToString() + " ks";
-            }
+            } else
+            {
+                MessageBox.Show("Nemůžete nakupovat bez připojení k internetu.", "Upozornění");
+            } 
         }
 
         private void ZobrazitKosik(object sender, RoutedEventArgs e)
         {
             if (KosikList.Count > 0 || cartClickAllowed == 1)
             {
-                NavigationService ns = NavigationService.GetNavigationService(this);
-                ns.Navigate(new Cart(KosikList));
+                if (App.CheckForInternetConnection() == true)
+                {
+                    NavigationService ns = NavigationService.GetNavigationService(this);
+                    ns.Navigate(new Cart(KosikList));
+                } else
+                {
+                    MessageBox.Show("Nemůžete nakupovat bez připojení k internetu.", "Upozornění");
+                }
             }
             
         }
 
         private void ZobrazitObjednavku(object sender, RoutedEventArgs e)
         {
-            NavigationService ns = NavigationService.GetNavigationService(this);
-            ns.Navigate(new ViewOrder());
+            if (App.CheckForInternetConnection() == true)
+            {
+                NavigationService ns = NavigationService.GetNavigationService(this);
+                ns.Navigate(new ViewOrder());
+            }
+            else
+            {
+                MessageBox.Show("Nemůžete prohlížet objednávky bez připojení k internetu.", "Upozornění");
+            }
+        }
+
+        private void SynchronizovatLokalniDatabaziAsync()
+        {
+            if (App.CheckForInternetConnection() == true)
+            {
+                var kategorie = App.DatabazeKategorii.GetItemsRest();
+                var zbozi = App.DatabazeZbozi.GetItemsRest();
+
+                App.DatabazeKategorii.DeleteItemsFromTable();
+                App.DatabazeZbozi.DeleteItemsFromTable();
+                App.CartDatabase.DeleteItemsFromTable();
+
+                foreach (Kategorie kategorie_item in kategorie)
+                {
+                    Kategorie kategorie_obj = new Kategorie();
+                    kategorie_obj.ID = kategorie_item.ID;
+                    kategorie_obj.NazevKategorie = kategorie_item.NazevKategorie;
+                    App.DatabazeKategorii.SaveItemAsync(kategorie_obj);
+                }
+
+                foreach (Zbozi zbozi_item in zbozi)
+                {
+                    Zbozi zbozi_obj = new Zbozi();
+                    zbozi_obj.ID = zbozi_item.ID;
+                    zbozi_obj.KategorieZbozi = zbozi_item.KategorieZbozi;
+                    zbozi_obj.NazevZbozi = zbozi_item.NazevZbozi;
+                    zbozi_obj.PocetKusuSkladem = zbozi_item.PocetKusuSkladem;
+                    zbozi_obj.Popis = zbozi_item.Popis;
+                    zbozi_obj.Vyprodej = zbozi_item.Vyprodej;
+                    zbozi_obj.FotoZbozi = zbozi_item.FotoZbozi;
+                    zbozi_obj.Cena = zbozi_item.Cena;
+                    zbozi_obj.CenaPredSlevou = zbozi_item.CenaPredSlevou;
+                    App.DatabazeZbozi.SaveItemAsync(zbozi_obj);
+                }
+            }
         }
     }
 }

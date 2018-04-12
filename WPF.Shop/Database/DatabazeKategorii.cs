@@ -56,19 +56,17 @@ namespace WPF.Shop.Database
 
         public Task<int> SaveItemAsync(Kategorie item)
         {
-            if (item.ID != 0)
-            {
-                return database.UpdateAsync(item);
-            }
-            else
-            {
-                return database.InsertAsync(item);
-            }
+            return database.InsertAsync(item);
         }
 
         public Task<int> DeleteItemAsync(Kategorie item)
         {
             return database.DeleteAsync(item);
+        }
+
+        public Task<List<Kategorie>> DeleteItemsFromTable()
+        {
+            return database.QueryAsync<Kategorie>("DELETE FROM Kategorie");
         }
     }
 }

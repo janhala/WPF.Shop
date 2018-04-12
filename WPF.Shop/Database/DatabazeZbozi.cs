@@ -123,5 +123,10 @@ namespace WPF.Shop.Database
         {
             return database.DeleteAsync(item);
         }
+
+        public Task<List<Zbozi>> DeleteItemsFromTable()
+        {
+            return database.QueryAsync<Zbozi>("DELETE FROM Zbozi");
+        }
     }
 }

@@ -101,6 +101,7 @@ namespace WPF.Shop.Database
         {
             var client = new RestClient(App.apiURL + "?CheckPIN");
             var request = new RestRequest(Method.GET);
+            request.AddParameter("cisloObjednavky", orderNumber);
             var response = client.Execute<List<Uzivatel>>(request);
 
             JsonDeserializer deserializer = new JsonDeserializer();

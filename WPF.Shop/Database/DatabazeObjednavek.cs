@@ -80,13 +80,19 @@ namespace WPF.Shop.Database
             request.AddParameter("cisloObjednavky", orderNumber);
             var response = client.Execute<List<Objednavka>>(request);
 
-            JsonDeserializer deserializer = new JsonDeserializer();
-            var data = deserializer.Deserialize<List<Objednavka>>(response);
+            if (response.ContentLength != 0)
+            {
+                JsonDeserializer deserializer = new JsonDeserializer();
+                var data = deserializer.Deserialize<List<Objednavka>>(response);
 
-            List<Objednavka> objednavka = new List<Objednavka>();
-            objednavka = data;
+                List<Objednavka> objednavka = new List<Objednavka>();
+                objednavka = data;
 
-            return objednavka;
+                return objednavka;
+            } else
+            {
+                return null;
+            }
         }
 
         //offline
@@ -95,20 +101,12 @@ namespace WPF.Shop.Database
             return database.QueryAsync<Objednavka>("DELETE FROM Objednavka WHERE cisloObjednavky = " + orderNumber);
         }
         //online
-        public List<Objednavka> StornovatObjednavkuRest(int orderNumber)
+        public void StornovatObjednavkuRest(int orderNumber)
         {
             var client = new RestClient(App.apiURL + "?StornovatObjednavku");
             var request = new RestRequest(Method.DELETE);
             request.AddParameter("cisloObjednavky", orderNumber);
-            var response = client.Execute<List<Objednavka>>(request);
-
-            JsonDeserializer deserializer = new JsonDeserializer();
-            var data = deserializer.Deserialize<List<Objednavka>>(response);
-
-            List<Objednavka> objednavka = new List<Objednavka>();
-            objednavka = data;
-
-            return objednavka;
+            var response = client.Execute(request);
         }
     }
 }

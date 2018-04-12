@@ -39,14 +39,15 @@ namespace WPF.Shop.Database
 
         public Task<int> SaveItemAsync(Kosik item)
         {
-            if (item.ID != 0)
+            return database.InsertAsync(item);
+            /*if (item.ID != 0)
             {
                 return database.UpdateAsync(item);
             }
             else
             {
                 return database.InsertAsync(item);
-            }
+            }*/
         }
 
         public Task<List<Kosik>> AktualizovatPocetKusuZbozi(int id)
@@ -75,6 +76,11 @@ namespace WPF.Shop.Database
         }
 
         public Task<List<Kosik>> OdstranitVsechnoZbozi()
+        {
+            return database.QueryAsync<Kosik>("DELETE FROM Kosik");
+        }
+
+        public Task<List<Kosik>> DeleteItemsFromTable()
         {
             return database.QueryAsync<Kosik>("DELETE FROM Kosik");
         }

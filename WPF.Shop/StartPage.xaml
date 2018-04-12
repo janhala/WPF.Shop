@@ -49,7 +49,7 @@
                     <Button Height="50" Grid.Column="0" Click="ZobrazitObjednavku" Background="White" BorderThickness="0" Margin="50,0,0,0">
                         <Image Source="Assets/userIcon.png" />
                     </Button>
-                    <Label Content="Přihlášení/Registrace" Grid.Column="1" VerticalAlignment="Center" />
+                    <Label Content="Moje objednávky" Grid.Column="1" VerticalAlignment="Center" />
                 </Grid>
                 
 

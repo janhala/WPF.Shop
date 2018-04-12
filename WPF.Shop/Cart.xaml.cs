@@ -140,18 +140,26 @@ namespace WPF.Shop
 
         private void SaveOrder(object sender, RoutedEventArgs e)
         {
-            if (jmeno.Text != null && jmeno.Text != "" || prijmeni.Text != null && prijmeni.Text != "" || telefon.Text != null && telefon.Text != "" || email.Text != null && email.Text != "" ||
-                pin.Text != null && pin.Text != "" || ulice.Text != null && ulice.Text != "" || obec.Text != null && obec.Text != "" || psc.Text != null && psc.Text != "")
+            int telefonNum = 0;
+            Int32.TryParse(telefon.Text, out telefonNum);
+            int pinNum = 0;
+            Int32.TryParse(pin.Text, out pinNum);
+            int pscNum = 0;
+            Int32.TryParse(psc.Text, out pscNum);
+
+            if (jmeno.Text != null && jmeno.Text != "" && prijmeni.Text != null && prijmeni.Text != "" && telefon.Text != null && telefon.Text != "" && email.Text != null && email.Text != "" &&
+                pin.Text != null && pin.Text != "" && ulice.Text != null && ulice.Text != "" && obec.Text != null && obec.Text != "" && psc.Text != null && psc.Text != "" &&
+                pscNum != 0 && telefonNum != 0 && pscNum != 0)
             {
                 Uzivatel uzivatel = new Uzivatel();
                 uzivatel.Jmeno = jmeno.Text;
                 uzivatel.Prijmeni = prijmeni.Text;
-                uzivatel.Telefon = Int32.Parse(telefon.Text);
+                uzivatel.Telefon = telefonNum;
                 uzivatel.Email = email.Text;
-                uzivatel.PIN = Int32.Parse(pin.Text);
+                uzivatel.PIN = pinNum;
                 uzivatel.UliceCP = ulice.Text;
                 uzivatel.Obec = obec.Text;
-                uzivatel.PSC = Int32.Parse(psc.Text);
+                uzivatel.PSC = pscNum;
                 App.DatabazeUzivatelu.SaveItemRest(uzivatel);
 
                 List<Uzivatel> userIDsql = App.DatabazeUzivatelu.GetAllIDsRest();
@@ -200,7 +208,7 @@ namespace WPF.Shop
                 ns.Navigate(new OrderNumber(randomNumber));
             } else
             {
-                MessageBox.Show("Vyplňte všechny údaje.");
+                MessageBox.Show("Vyplňte všechny údaje, nebo zkontrolujte správnost zadaných.");
             }
         }
 

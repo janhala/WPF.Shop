@@ -9,7 +9,7 @@ namespace WPF.Shop.Classes
 {
     public class Zbozi
     {
-        [PrimaryKey, AutoIncrement]
+        [PrimaryKey]
         public int ID { get; set; }
         public string NazevZbozi { get; set; }
         public int Cena { get; set; } // vypocet ceny bez DPH

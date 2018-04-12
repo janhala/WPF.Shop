@@ -28,23 +28,31 @@ namespace WPF.Shop
 
         private void VypsatObjednavku(object sender, RoutedEventArgs e)
         {
-
             int orderNumber = 0;
             Int32.TryParse(cisloObjednavky.Text, out orderNumber);
 
-            //GetWhereOrderNumberRest
-            List<Objednavka> getOrderItems = getOrderItems = App.DatabazeObjednavek.GetWhereOrderNumberRest(orderNumber);
+            if (orderNumber != 0)
+            {
+                List<Objednavka> getOrderItems = getOrderItems = App.DatabazeObjednavek.GetWhereOrderNumberRest(orderNumber);
 
-            if (getOrderItems.Count < 1)
+                if (getOrderItems != null)
+                {
+                    if (getOrderItems.Count < 1)
+                    {
+                        pinLBL.Visibility = Visibility.Visible;
+                        pinLBL.Content = "Objednávka s tímto číslem neexistuje!!";
+                    }
+                    else
+                    {
+                        pinLBL.Visibility = Visibility.Collapsed;
+                        objednavkaLV.ItemsSource = getOrderItems;
+                    }
+                }
+            } else
             {
-                pinLBL.Visibility = Visibility.Visible;
-                pinLBL.Content = "Objednávka s tímto číslem neexistuje!!";
+                MessageBox.Show("Zadejte číslo Vaší objednávky.", "Upozornění");
             }
-            else
-            {
-                pinLBL.Visibility = Visibility.Collapsed;
-                objednavkaLV.ItemsSource = getOrderItems;
-            }            
+                     
         }
 
         private void ZobrazitPIN(object sender, RoutedEventArgs e)
@@ -57,27 +65,19 @@ namespace WPF.Shop
 
         private void StornovatObjednavku(object sender, RoutedEventArgs e)
         {
-            if (cisloObjednavky.Text != null && cisloObjednavky.Text != "")
+            int pinNumber = 0;
+            Int32.TryParse(pin.Text, out pinNumber);
+
+            int cisloObjednavkyNum;
+            Int32.TryParse(cisloObjednavky.Text, out cisloObjednavkyNum);
+
+            if (cisloObjednavky.Text != null && cisloObjednavky.Text != "" && pinNumber != 0 && cisloObjednavkyNum != 0)
             {
-                List<Uzivatel> sqlPIN;
-                if (App.CheckForInternetConnection() == true)
-                {
-                    sqlPIN = App.DatabazeUzivatelu.CheckPINRest(int.Parse(cisloObjednavky.Text));
-                }
-                else
-                {
-                    sqlPIN = App.DatabazeUzivatelu.CheckPIN(int.Parse(cisloObjednavky.Text)).Result;
-                }
+                List<Uzivatel> sqlPIN = App.DatabazeUzivatelu.CheckPINRest(cisloObjednavkyNum);
                  
-                if (sqlPIN[0].PIN == int.Parse(pin.Text))
+                if (sqlPIN[0].PIN == pinNumber)
                 {
-                    if (App.CheckForInternetConnection() == true)
-                    {
-                        App.DatabazeObjednavek.StornovatObjednavkuRest(int.Parse(cisloObjednavky.Text));
-                    } else
-                    {
-                        App.DatabazeObjednavek.StornovatObjednavku(int.Parse(cisloObjednavky.Text));
-                    }
+                    App.DatabazeObjednavek.StornovatObjednavkuRest(cisloObjednavkyNum);
 
                     pinLBL.Visibility = Visibility.Visible;
                     pinLBL.Content = "Úspěšně stornováno, těšíme se na další nákup :)";
@@ -92,7 +92,7 @@ namespace WPF.Shop
             } else
             {
                 pinLBL.Visibility = Visibility.Visible;
-                pinLBL.Content = "Objednávka s tímto číslem neexistuje!!";
+                pinLBL.Content = "Objednávka s tímto číslem neexistuje, nebo jste chybně zadali Váš PIN.";
             }            
         }
     }

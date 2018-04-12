@@ -9,7 +9,8 @@ namespace WPF.Shop.Classes
 {
     public class Kategorie
     {
-        [PrimaryKey, AutoIncrement]
+        //[PrimaryKey, AutoIncrement]
+        [PrimaryKey]
         public int ID { get; set; }
         public string NazevKategorie { get; set; }
 

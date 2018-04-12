@@ -7,6 +7,6 @@
         mc:Ignorable="d"
         Title="MainWindow" MinHeight="500" MinWidth="1250">
     <Grid>
-        <Frame Source="StartPage.xaml" NavigationUIVisibility="Hidden" />
+        <Frame Source="StartPage.xaml" NavigationUIVisibility="Visible" />
     </Grid>
 </Window>
